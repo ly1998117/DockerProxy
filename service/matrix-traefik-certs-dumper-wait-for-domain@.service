@@ -1,0 +1,29 @@
+[Unit]
+Description=Traefik certs dumper waiter (matrix-traefik-certs-dumper-wait-for-domain) for %i
+Requires=docker.service
+After=docker.service
+Requires=matrix-traefik-certs-dumper.service
+After=matrix-traefik-certs-dumper.service
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+Environment="HOME=/root"
+
+# We can't assign a container name here (even one that includes `%i`),
+# because multiple services many depend on `waiter@SAME_DOMAIN` and then we'd be generating
+# the same name for each invocation and potentially killing other (simultaneously running) instances
+# from `ExecStartPre` / `ExecStop` cleanup tasks.
+ExecStart=/usr/bin/env docker run \
+			--rm \
+			--log-driver=none \
+			--mount type=bind,src=/matrix/traefik-certs-dumper/bin,dst=/certs-dumper-bin,ro \
+			--mount type=bind,src=/matrix/traefik-certs-dumper/dumped-certificates,dst=/matrix/traefik-certs-dumper/dumped-certificates,ro \
+			--entrypoint=/bin/sh \
+			docker.io/ldez/traefik-certs-dumper:v2.8.1 \
+			-c '/certs-dumper-bin/wait-for-domain.sh %i'
+
+SyslogIdentifier=matrix-traefik-certs-dumper-%i
+
+[Install]
+WantedBy=multi-user.target

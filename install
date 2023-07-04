@@ -1,0 +1,33 @@
+#!/bin/bash
+
+if [ "$(id -u)" != "0" ]; then
+	echo "This script must be executed as root! Aborting."
+	exit 1
+fi
+
+echo "WARNING! You are about to Create everything the playbook installs for matrix.vps.liuy.site: matrix, docker images,..."
+echo -n "If you're sure you want to do this, type: 'Yes, I really want to remove everything!'"
+read sure
+
+if [ "$sure" != "Yes, I really want to Create everything!" ]; then
+	echo "Good thing I asked, exiting"
+	exit 0
+else
+	echo "Stop and remove matrix services"
+	echo "Create Docker matrix network (should be gone already, but ..)"
+  docker network create matrix
+	
+	echo "Create /matrix directory"
+	mkdir "/matrix"
+  mv -fr "./matrix" "/matrix"
+
+	for s in $(find ./service/ -type f -name "matrix-*" -printf "%f\n"); do
+		systemctl disable --now $s
+		cp ./service/$s /etc/systemd/system/$s
+		systemctl start --now $s
+	done
+
+	systemctl daemon-reload
+	exit 0
+fi
+

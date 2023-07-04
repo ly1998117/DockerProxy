@@ -1,0 +1,35 @@
+accessLog: {}
+api:
+  dashboard: false
+certificatesResolvers:
+  default:
+    acme:
+      caServer: https://acme-v02.api.letsencrypt.org/directory
+      email: liu.yang.mine@gmail.com
+      httpChallenge:
+        entrypoint: web
+      storage: /ssl/acme.json
+entryPoints:
+  matrix-federation:
+    address: :8448
+  web:
+    address: :8080
+    http:
+      redirections:
+        entryPoint:
+          scheme: https
+          to: :443
+  web-secure:
+    address: :8443
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+log:
+  level: INFO
+providers:
+  docker:
+    endpoint: tcp://matrix-container-socket-proxy:2375
+    exposedByDefault: false
+    network: traefik
+  file:
+    filename: /config/provider.yml

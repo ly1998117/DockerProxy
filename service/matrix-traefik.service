@@ -1,0 +1,44 @@
+[Unit]
+Description=Traefik (matrix-traefik)
+Requires=docker.service
+After=docker.service
+Requires=matrix-container-socket-proxy.service
+After=matrix-container-socket-proxy.service
+DefaultDependencies=no
+
+[Service]
+Type=simple
+Environment="HOME=/root"
+ExecStartPre=-/usr/bin/env sh -c '/usr/bin/env docker kill matrix-traefik 2>/dev/null || true'
+ExecStartPre=-/usr/bin/env sh -c '/usr/bin/env docker rm matrix-traefik 2>/dev/null || true'
+
+ExecStartPre=/usr/bin/env docker create \
+			--rm \
+			--name=matrix-traefik \
+			--log-driver=none \
+						--user=997:1002 \
+			--cap-drop=ALL \
+						--read-only \
+			--network=traefik \
+						-p 80:8080 \
+									-p 443:8443 \
+									-p 8448:8448 \
+						--env-file=/matrix/traefik/config/env \
+			--label-file=/matrix/traefik/config/labels \
+			--mount type=bind,src=/matrix/traefik/config,dst=/config,ro \
+						--mount type=bind,src=/matrix/traefik/ssl,dst=/ssl \
+									docker.io/traefik:v2.9.9 \
+						--configFile=/config/traefik.yml
+
+ExecStartPre=/usr/bin/env docker network connect matrix-container-socket-proxy matrix-traefik
+
+ExecStart=/usr/bin/env docker start --attach matrix-traefik
+
+ExecStop=-/usr/bin/env sh -c '/usr/bin/env docker kill matrix-traefik 2>/dev/null || true'
+ExecStop=-/usr/bin/env sh -c '/usr/bin/env docker rm matrix-traefik 2>/dev/null || true'
+Restart=always
+RestartSec=30
+SyslogIdentifier=matrix-traefik
+
+[Install]
+WantedBy=multi-user.target

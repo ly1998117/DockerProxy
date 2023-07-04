@@ -1,0 +1,43 @@
+[Unit]
+Description=Matrix nginx-proxy server
+Requires=docker.service
+After=docker.service
+#Wants=matrix-synapse.service
+#Wants=matrix-synapse-reverse-proxy-companion.service
+DefaultDependencies=no
+
+[Service]
+Type=simple
+Environment="HOME=/root"
+ExecStartPre=-/usr/bin/env sh -c '/usr/bin/env docker kill matrix-nginx-proxy 2>/dev/null || true'
+ExecStartPre=-/usr/bin/env sh -c '/usr/bin/env docker rm matrix-nginx-proxy 2>/dev/null || true'
+
+ExecStartPre=/usr/bin/env docker create \
+			--rm \
+			--name=matrix-nginx-proxy \
+			--log-driver=none \
+			--user=997:1002 \
+			--cap-drop=ALL \
+			--read-only \
+			--tmpfs=/tmp:rw,noexec,nosuid,size=7500m \
+			--label-file=/matrix/nginx-proxy/labels \
+			--network=matrix \
+			--mount type=bind,src=/matrix/nginx-proxy/nginx.conf,dst=/etc/nginx/nginx.conf,ro \
+			--mount type=bind,src=/matrix/nginx-proxy/data,dst=/nginx-data,ro \
+			--mount type=bind,src=/matrix/nginx-proxy/conf.d,dst=/etc/nginx/conf.d,ro \
+			--mount type=bind,src=/matrix/static-files,dst=/matrix/static-files,ro \
+			docker.io/nginx:1.23.3-alpine
+
+ExecStartPre=/usr/bin/env docker network connect traefik matrix-nginx-proxy
+
+ExecStart=/usr/bin/env docker start --attach matrix-nginx-proxy
+
+ExecStop=-/usr/bin/env sh -c '/usr/bin/env docker kill matrix-nginx-proxy 2>/dev/null || true'
+ExecStop=-/usr/bin/env sh -c '/usr/bin/env docker rm matrix-nginx-proxy 2>/dev/null || true'
+ExecReload=/usr/bin/env docker exec matrix-nginx-proxy /usr/sbin/nginx -s reload
+Restart=always
+RestartSec=30
+SyslogIdentifier=matrix-nginx-proxy
+
+[Install]
+WantedBy=multi-user.target

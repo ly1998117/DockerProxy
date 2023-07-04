@@ -1,0 +1,83 @@
+traefik.enable=true
+
+traefik.docker.network=traefik
+
+
+# Base domain
+traefik.http.routers.matrix-nginx-proxy-base-domain.rule=Host(`vps.liuy.site`)
+traefik.http.routers.matrix-nginx-proxy-base-domain.service=matrix-nginx-proxy-web
+traefik.http.routers.matrix-nginx-proxy-base-domain.tls=true
+traefik.http.routers.matrix-nginx-proxy-base-domain.tls.certResolver=default
+traefik.http.routers.matrix-nginx-proxy-base-domain.entrypoints=web-secure
+
+# ChatGPT Client
+traefik.http.routers.matrix-nginx-proxy-chatgpt-client.rule=Host(`chatgpt.liuy.site`)
+traefik.http.routers.matrix-nginx-proxy-chatgpt-client.service=matrix-nginx-proxy-web
+traefik.http.routers.matrix-nginx-proxy-chatgpt-client.tls=true
+traefik.http.routers.matrix-nginx-proxy-chatgpt-client.tls.certResolver=default
+traefik.http.routers.matrix-nginx-proxy-chatgpt-client.entrypoints=web-secure
+
+# ChatGPT Client
+traefik.http.routers.matrix-nginx-proxy-chataca-client.rule=Host(`acagpt.liuy.site`)
+traefik.http.routers.matrix-nginx-proxy-chataca-client.service=matrix-nginx-proxy-web
+traefik.http.routers.matrix-nginx-proxy-chataca-client.tls=true
+traefik.http.routers.matrix-nginx-proxy-chataca-client.tls.certResolver=default
+traefik.http.routers.matrix-nginx-proxy-chataca-client.entrypoints=web-secure
+
+# Openai Client
+traefik.http.routers.matrix-nginx-proxy-openai-client.rule=Host(`openai.liuy.site`)
+traefik.http.routers.matrix-nginx-proxy-openai-client.service=matrix-nginx-proxy-web
+traefik.http.routers.matrix-nginx-proxy-openai-client.tls=true
+traefik.http.routers.matrix-nginx-proxy-openai-client.tls.certResolver=default
+traefik.http.routers.matrix-nginx-proxy-openai-client.entrypoints=web-secure
+
+# Shop Client
+traefik.http.routers.matrix-nginx-proxy-shop-client.rule=Host(`shop.liuy.site`)
+traefik.http.routers.matrix-nginx-proxy-shop-client.service=matrix-nginx-proxy-web
+traefik.http.routers.matrix-nginx-proxy-shop-client.tls=true
+traefik.http.routers.matrix-nginx-proxy-shop-client.tls.certResolver=default
+traefik.http.routers.matrix-nginx-proxy-shop-client.entrypoints=web-secure
+
+# Check Client
+traefik.http.routers.matrix-nginx-proxy-check-client.rule=Host(`check.liuy.site`)
+traefik.http.routers.matrix-nginx-proxy-check-client.service=matrix-nginx-proxy-web
+traefik.http.routers.matrix-nginx-proxy-check-client.tls=true
+traefik.http.routers.matrix-nginx-proxy-check-client.tls.certResolver=default
+traefik.http.routers.matrix-nginx-proxy-check-client.entrypoints=web-secure
+
+# Base domain
+traefik.http.routers.matrix-nginx-proxy-alist-domain.rule=Host(`alist.vps.liuy.site`)
+traefik.http.routers.matrix-nginx-proxy-alist-domain.service=matrix-nginx-proxy-web
+traefik.http.routers.matrix-nginx-proxy-alist-domain.tls=true
+traefik.http.routers.matrix-nginx-proxy-alist-domain.tls.certResolver=default
+traefik.http.routers.matrix-nginx-proxy-alist-domain.entrypoints=web-secure
+
+traefik.http.routers.matrix-nginx-proxy-xiaoya-domain.rule=Host(`movie.vps.liuy.site`)
+traefik.http.routers.matrix-nginx-proxy-xiaoya-domain.service=matrix-nginx-proxy-web
+traefik.http.routers.matrix-nginx-proxy-xiaoya-domain.tls=true
+traefik.http.routers.matrix-nginx-proxy-xiaoya-domain.tls.certResolver=default
+traefik.http.routers.matrix-nginx-proxy-xiaoya-domain.entrypoints=web-secure
+
+
+# Matrix Client
+traefik.http.routers.matrix-nginx-proxy-matrix-client.rule=Host(`matrix.vps.liuy.site`)
+traefik.http.routers.matrix-nginx-proxy-matrix-client.service=matrix-nginx-proxy-web
+traefik.http.routers.matrix-nginx-proxy-matrix-client.tls=true
+traefik.http.routers.matrix-nginx-proxy-matrix-client.tls.certResolver=default
+traefik.http.routers.matrix-nginx-proxy-matrix-client.entrypoints=web-secure
+
+# Matrix Federation
+traefik.http.routers.matrix-nginx-proxy-matrix-federation.rule=Host(`matrix.vps.liuy.site`)
+traefik.http.routers.matrix-nginx-proxy-matrix-federation.service=matrix-nginx-proxy-federation
+traefik.http.routers.matrix-nginx-proxy-matrix-federation.tls=true
+traefik.http.routers.matrix-nginx-proxy-matrix-federation.tls.certResolver=default
+traefik.http.routers.matrix-nginx-proxy-matrix-federation.entrypoints=matrix-federation
+
+
+
+
+traefik.http.services.matrix-nginx-proxy-web.loadbalancer.server.port=8080
+
+traefik.http.services.matrix-nginx-proxy-federation.loadbalancer.server.port=8448
+
+

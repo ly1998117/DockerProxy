@@ -1,0 +1,38 @@
+[Unit]
+Description=Container Socket Proxy (matrix-container-socket-proxy)
+Requires=docker.service
+After=docker.service
+DefaultDependencies=no
+
+[Service]
+Type=simple
+Environment="HOME=/root"
+ExecStartPre=-/usr/bin/env sh -c '/usr/bin/env docker kill matrix-container-socket-proxy 2>/dev/null || true'
+ExecStartPre=-/usr/bin/env sh -c '/usr/bin/env docker rm matrix-container-socket-proxy 2>/dev/null || true'
+
+ExecStartPre=/usr/bin/env docker create \
+			--rm \
+			--name=matrix-container-socket-proxy \
+			--log-driver=none \
+			--cap-drop=ALL \
+			--read-only \
+			--network=matrix-container-socket-proxy \
+			--env-file=/matrix/container-socket-proxy/env \
+			--label-file=/matrix/container-socket-proxy/labels \
+			--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock,ro \
+			--tmpfs=/var/lib/haproxy:rw,noexec,nosuid,size=100m \
+			--tmpfs=/run:rw,noexec,nosuid,size=100m \
+						ghcr.io/tecnativa/docker-socket-proxy:0.1.1
+
+
+ExecStart=/usr/bin/env docker start --attach matrix-container-socket-proxy
+
+ExecStop=-/usr/bin/env sh -c '/usr/bin/env docker kill matrix-container-socket-proxy 2>/dev/null || true'
+ExecStop=-/usr/bin/env sh -c '/usr/bin/env docker rm matrix-container-socket-proxy 2>/dev/null || true'
+
+Restart=always
+RestartSec=30
+SyslogIdentifier=matrix-container-socket-proxy
+
+[Install]
+WantedBy=multi-user.target

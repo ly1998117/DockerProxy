@@ -1,0 +1,60 @@
+---
+# The bare domain name which represents your Matrix identity.
+# Matrix user ids for your server will be of the form (`@user:<matrix-domain>`).
+#
+# Note: this playbook does not touch the server referenced here.
+# Installation happens on another server ("matrix.<matrix-domain>").
+#
+# If you've deployed using the wrong domain, you'll have to run the Uninstalling step,
+# because you can't change the Domain after deployment.
+#
+# Example value: example.com
+matrix_domain: vps.liuy.site
+
+# The Matrix homeserver software to install.
+# See:
+#  - `roles/custom/matrix-base/defaults/main.yml` for valid options
+# - the `docs/configuring-playbook-IMPLEMENTATION_NAME.md` documentation page, if one is available for your implementation choice
+matrix_homeserver_implementation: synapse
+
+# A secret used as a base, for generating various other secrets.
+# You can put any string here, but generating a strong one is preferred (e.g. `pwgen -s 64 1`).
+matrix_homeserver_generic_secret_key: 'Ill1D9WaV1JQwjZLRzE2Oiia4NrTczJ64jKQoKq65p2zKuUrAJYljhWodM2YPII5'
+workers matrix_synapse_workers_enabled: true 
+matrix_synapse_workers_preset: one-of-each
+matrix_synapse_admin_enabled: true
+matrix_nginx_proxy_base_domain_serving_enabled: true
+matrix_registration_enabled: false
+
+# Optimizations for small VPS
+# An identity server is not a must.
+#matrix_ma1sd_enabled: false
+
+# Disabling this will prevent email-notifications and other such things from working.
+
+matrix_mailer_enabled: false
+#matrix_synapse_configuration_extension_yaml: |
+ # limit_remote_rooms:
+  #  enabled: true
+#    complexity: 1.0
+
+# By default, the playbook manages its own Traefik (https://doc.traefik.io/traefik/) reverse-proxy server.
+# It will retrieve SSL certificates for you on-demand and forward requests to all other components.
+# For alternatives, see `docs/configuring-playbook-own-webserver.md`.
+matrix_playbook_reverse_proxy_type: playbook-managed-traefik
+
+# This is something which is provided to Let's Encrypt when retrieving SSL certificates for domains.
+#
+# In case SSL renewal fails at some point, you'll also get an email notification there.
+#
+# If you decide to use another method for managing SSL certificates (different than the default Let's Encrypt),
+# you won't be required to define this variable (see `docs/configuring-playbook-ssl-certificates.md`).
+#
+# Example value: someone@example.com
+devture_traefik_config_certificatesResolvers_acme_email: 'liu.yang.mine@gmail.com'
+
+# A Postgres password to use for the superuser Postgres user (called `matrix` by default).
+#
+# The playbook creates additional Postgres users and databases (one for each enabled service)
+# using this superuser account.
+devture_postgres_connection_password: '1998'
