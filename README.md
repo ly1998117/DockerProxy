@@ -1,7 +1,7 @@
 # Docker Proxy
 ## Description
-This is a HTTPS signed and proxy service for docker containers. It allows you to run multiple containers on the same network `matrix`. 
-The proxy will automatically forward the https request to the container (distinguished by its name). 
+This is a HTTPS certification and proxy service for docker containers. It allows you to run multiple containers without complex HTTPS signing operations. 
+The proxy will sign automatically and forward the HTTPS request to the docker container without port exposure. 
 
 The cript `install.sh` will install several systemd services.
 + nginx-proxy.service: the proxy
